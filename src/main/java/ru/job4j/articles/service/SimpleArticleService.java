@@ -9,6 +9,7 @@ import ru.job4j.articles.store.Store;
 
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class SimpleArticleService implements ArticleService {
 
@@ -24,10 +25,10 @@ public class SimpleArticleService implements ArticleService {
     public void generate(Store<Word> wordStore, int count, Store<Article> articleStore) {
         LOGGER.info("Геренация статей в количестве {}", count);
         var words = wordStore.findAll();
-        var articles = IntStream.iterate(0, i -> i < count, i -> i + 1)
-                .peek(i -> LOGGER.info("Сгенерирована статья № {}", i))
-                .mapToObj((x) -> articleGenerator.generate(words))
-                .collect(Collectors.toList());
-        articles.forEach(articleStore::save);
+        for (int i = 0; i < count; i++) {
+            LOGGER.info("Сгенерирована статья № {}", i);
+            var word = articleGenerator.generate(words);
+            articleStore.save(word);
+        }
     }
 }
